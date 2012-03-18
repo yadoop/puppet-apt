@@ -3,10 +3,11 @@
 define apt::ppa(
 
 ) {
-    require apt
+
+    include apt
 
     exec { "apt-update-${name}":
-        command     => "/usr/bin/aptitude update",
+        command     => "${apt::provider} update",
         refreshonly => true,
     }
 
@@ -14,5 +15,5 @@ define apt::ppa(
         command => "/usr/bin/add-apt-repository ${name}",
         notify  => Exec["apt-update-${name}"],
     }
-}
 
+}

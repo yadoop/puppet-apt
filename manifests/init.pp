@@ -1,29 +1,34 @@
 # apt.pp
 
 class apt {
-	$root = '/etc/apt'
-	$provider = '/usr/bin/apt-get'
 
-  package { "python-software-properties": }
+    $root = '/etc/apt'
+    $provider = '/usr/bin/apt-get'
 
-	file { "sources.list":
-		name => "${root}/sources.list",
-		ensure => present,
-		owner => root,
-		group => root,
-		mode => 644,
-	}
+    package { "python-software-properties": }
 
-	file { "sources.list.d":
-		name => "${root}/sources.list.d",
-		ensure => directory,
-		owner => root,
-		group => root,
-	}
+    file { "sources.list":
+        name => "${root}/sources.list",
+        ensure => present,
+        owner => root,
+        group => root,
+        mode => 644,
+    }
 
-	exec { "apt_update":
-		command => "${provider} update",
-		subscribe => [ File["sources.list"], File["sources.list.d"] ],
-		refreshonly => true,
-	}
+    file { "sources.list.d":
+        name => "${root}/sources.list.d",
+        ensure => directory,
+        owner => root,
+        group => root,
+    }
+
+    exec { "apt_update":
+        command => "${provider} update",
+        subscribe => [ File["sources.list"], File["sources.list.d"] ],
+        refreshonly => true,
+    }
+
+    # Ensure apt-get update has been run before installing any packages
+    Exec["apt_update"] -> Package <| |>
+
 }
